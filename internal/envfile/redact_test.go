@@ -76,3 +76,21 @@ func TestRedact_EmptyMap(t *testing.T) {
 		t.Errorf("expected empty result for empty input")
 	}
 }
+
+func TestRedact_ExplicitKeysCaseInsensitive(t *testing.T) {
+	env := map[string]string{
+		"my_token": "supersecret",
+		"VISIBLE":  "yes",
+	}
+	opts := RedactOptions{Keys: []string{"MY_TOKEN"}}
+	result := Redact(env, opts)
+
+	// Explicit keys should match case-insensitively so that callers don't
+	// need to know the exact casing used in the env map.
+	if result["my_token"] != redactedValue {
+		t.Errorf("expected my_token to be redacted by case-insensitive key match, got %q", result["my_token"])
+	}
+	if result["VISIBLE"] != "yes" {
+		t.Errorf("expected VISIBLE to remain unchanged")
+	}
+}
