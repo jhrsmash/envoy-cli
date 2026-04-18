@@ -38,6 +38,9 @@ func TestSaveAndLoadSnapshot(t *testing.T) {
 	if loaded.Env["FOO"] != "bar" {
 		t.Errorf("expected FOO=bar, got %s", loaded.Env["FOO"])
 	}
+	if loaded.Env["BAZ"] != "qux" {
+		t.Errorf("expected BAZ=qux, got %s", loaded.Env["BAZ"])
+	}
 }
 
 func TestLoadSnapshot_InvalidFile(t *testing.T) {
@@ -54,5 +57,15 @@ func TestLoadSnapshot_MissingFile(t *testing.T) {
 	_, err := LoadSnapshot("/nonexistent/path/snap.json")
 	if err == nil {
 		t.Error("expected error for missing file")
+	}
+}
+
+func TestNewSnapshot_EmptyMap(t *testing.T) {
+	s := NewSnapshot("empty", map[string]string{})
+	if s.Label != "empty" {
+		t.Errorf("expected label 'empty', got %s", s.Label)
+	}
+	if len(s.Env) != 0 {
+		t.Errorf("expected empty env map, got %v", s.Env)
 	}
 }
