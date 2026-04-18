@@ -6,8 +6,8 @@ import (
 
 func TestValidate_Valid(t *testing.T) {
 	env := map[string]string{
-		"HOST": "localhost",
-		"PORT": "8080",
+		"HOST":  "localhost",
+		"PORT":  "8080",
 		"DEBUG": "true",
 	}
 	result := Validate(env)
@@ -59,10 +59,20 @@ func TestValidate_KeyStartsWithEquals(t *testing.T) {
 	}
 }
 
+func TestValidate_EmptyKey(t *testing.T) {
+	env := map[string]string{
+		"": "value",
+	}
+	result := Validate(env)
+	if result.Valid() {
+		t.Error("expected validation error for empty key")
+	}
+}
+
 func TestValidate_MultipleErrors(t *testing.T) {
 	env := map[string]string{
-		"GOOD":   "value",
-		"EMPTY":  "",
+		"GOOD":    "value",
+		"EMPTY":   "",
 		"BAD KEY": "x",
 	}
 	result := Validate(env)
