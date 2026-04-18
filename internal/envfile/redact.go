@@ -47,6 +47,27 @@ func Redact(env map[string]string, opts RedactOptions) map[string]string {
 	return result
 }
 
+// RedactedKeys returns the list of keys from env that would be redacted by
+// Redact with the given options. Useful for dry-run or audit logging.
+func RedactedKeys(env map[string]string, opts RedactOptions) []string {
+	explicit := make(map[string]struct{}, len(opts.Keys))
+	for _, k := range opts.Keys {
+		explicit[strings.ToUpper(k)] = struct{}{}
+	}
+
+	patterns := make([]*regexp.Regexp, 0, len(defaultSensitivePatterns)+len(opts.ExtraPatterns))
+	patterns = append(patterns, defaultSensitivePatterns...)
+	patterns = append(patterns, opts.ExtraPatterns...)
+
+	var keys []string
+	for k := range env {
+		if isSensitive(k, explicit, patterns) {
+			keys = append(keys, k)
+		}
+	}
+	return keys
+}
+
 func isSensitive(key string, explicit map[string]struct{}, patterns []*regexp.Regexp) bool {
 	if _, ok := explicit[strings.ToUpper(key)]; ok {
 		return true
