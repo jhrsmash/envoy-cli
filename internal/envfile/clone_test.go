@@ -31,8 +31,8 @@ func TestClone_DoesNotMutateSource(t *testing.T) {
 
 func TestClone_RedactsSensitiveKeys(t *testing.T) {
 	src := map[string]string{
-		"APP":        "myapp",
-		"SECRET_KEY": "hunter2",
+		"APP":         "myapp",
+		"SECRET_KEY":  "hunter2",
 		"DB_PASSWORD": "s3cr3t",
 	}
 	dst, result := Clone(src, CloneOptions{RedactSensitive: true})
@@ -71,6 +71,20 @@ func TestClone_EmptySource(t *testing.T) {
 	}
 	if len(result.Keys) != 0 {
 		t.Error("expected no keys in result")
+	}
+}
+
+func TestClone_RedactedKeysNotInKeys(t *testing.T) {
+	// Redacted keys should still appear in result.Keys (they were copied),
+	// but their values should differ from the source.
+	src := map[string]string{"SECRET_KEY": "hunter2", "APP": "myapp"}
+	dst, result := Clone(src, CloneOptions{RedactSensitive: true})
+
+	if len(result.Keys) != 2 {
+		t.Errorf("expected 2 keys in result, got %d", len(result.Keys))
+	}
+	if dst["SECRET_KEY"] == "hunter2" {
+		t.Error("redacted key value should not match source")
 	}
 }
 
