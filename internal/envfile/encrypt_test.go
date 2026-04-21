@@ -30,6 +30,24 @@ func TestEncryptDecrypt_RoundTrip(t *testing.T) {
 	}
 }
 
+func TestEncryptDecrypt_EmptyMap(t *testing.T) {
+	env := map[string]string{}
+
+	enc, err := Encrypt(env, "passphrase")
+	if err != nil {
+		t.Fatalf("Encrypt: %v", err)
+	}
+
+	got, err := Decrypt(enc, "passphrase")
+	if err != nil {
+		t.Fatalf("Decrypt: %v", err)
+	}
+
+	if len(got) != 0 {
+		t.Errorf("expected empty map, got %v", got)
+	}
+}
+
 func TestEncrypt_EmptyPassphrase(t *testing.T) {
 	_, err := Encrypt(map[string]string{"K": "V"}, "")
 	if err == nil {
