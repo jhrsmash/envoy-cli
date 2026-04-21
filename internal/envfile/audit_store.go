@@ -43,3 +43,13 @@ func LoadAuditLog(path string) (AuditLog, error) {
 
 	return log, nil
 }
+
+// ClearAuditLog removes the audit log file at the given path.
+// Returns nil if the file does not exist.
+func ClearAuditLog(path string) error {
+	err := os.Remove(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+	return err
+}
