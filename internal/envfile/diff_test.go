@@ -71,3 +71,25 @@ func TestDiff_Mixed(t *testing.T) {
 		t.Errorf("unexpected changed: %v", result.Changed)
 	}
 }
+
+func TestDiff_EmptyMaps(t *testing.T) {
+	t.Run("both empty", func(t *testing.T) {
+		result := Diff(map[string]string{}, map[string]string{})
+		if !result.IsEmpty() {
+			t.Errorf("expected no diff for two empty maps, got added=%v removed=%v changed=%v",
+				result.Added, result.Removed, result.Changed)
+		}
+	})
+	t.Run("empty base", func(t *testing.T) {
+		result := Diff(map[string]string{}, map[string]string{"FOO": "bar"})
+		if len(result.Added) != 1 || result.Added["FOO"] != "bar" {
+			t.Errorf("expected FOO to be added, got added=%v", result.Added)
+		}
+	})
+	t.Run("empty target", func(t *testing.T) {
+		result := Diff(map[string]string{"FOO": "bar"}, map[string]string{})
+		if len(result.Removed) != 1 || result.Removed["FOO"] != "bar" {
+			t.Errorf("expected FOO to be removed, got removed=%v", result.Removed)
+		}
+	})
+}
