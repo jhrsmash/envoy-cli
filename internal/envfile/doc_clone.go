@@ -20,4 +20,12 @@
 //	})
 //
 // The original source map is never modified.
+//
+// # CloneResult
+//
+// The returned CloneResult value reports how many keys were copied and
+// how many values were redacted during the operation:
+//
+//	dst, result := envfile.Clone(src, envfile.CloneOptions{RedactSensitive: true})
+//	fmt.Printf("copied %d keys, redacted %d values\n", result.Copied, result.Redacted)
 package envfile
