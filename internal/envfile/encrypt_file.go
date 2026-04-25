@@ -19,7 +19,8 @@ func marshalDotenv(env map[string]string) string {
 }
 
 // SaveEncrypted encrypts env with passphrase and writes the result as
-// a JSON file to path.
+// a JSON file to path. The file is written with mode 0600 to restrict
+// access to the owning user only.
 func SaveEncrypted(path string, env map[string]string, passphrase string) error {
 	enc, err := Encrypt(env, passphrase)
 	if err != nil {
@@ -55,4 +56,20 @@ func LoadEncrypted(path, passphrase string) (map[string]string, error) {
 		return nil, fmt.Errorf("load encrypted: %w", err)
 	}
 	return env, nil
+}
+
+// RekeyEncrypted re-encrypts the env file at path using a new passphrase.
+// It decrypts with oldPassphrase, then re-encrypts and overwrites the file
+// with newPassphrase. The operation is atomic with respect to the passphrase
+// change — the file is only overwritten if both steps succeed.
+func RekeyEncrypted(path, oldPassphrase, newPassphrase string) error {
+	env, err := LoadEncrypted(path, oldPassphrase)
+	if err != nil {
+		return fmt.Errorf("rekey encrypted: %w", err)
+	}
+
+	if err := SaveEncrypted(path, env, newPassphrase); err != nil {
+		return fmt.Errorf("rekey encrypted: %w", err)
+	}
+	return nil
 }
