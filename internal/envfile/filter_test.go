@@ -63,6 +63,19 @@ func TestFilter_ByExplicitKeys(t *testing.T) {
 	}
 }
 
+func TestFilter_ByExplicitKeys_MissingKeyNotInMatched(t *testing.T) {
+	r, err := Filter(baseFilterEnv, FilterOptions{Keys: []string{"LOG_LEVEL", "NONEXISTENT"}})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if _, ok := r.Matched["NONEXISTENT"]; ok {
+		t.Error("expected NONEXISTENT to not appear in matched")
+	}
+	if len(r.Matched) != 1 {
+		t.Errorf("expected 1 matched, got %d", len(r.Matched))
+	}
+}
+
 func TestFilter_InvalidPattern(t *testing.T) {
 	_, err := Filter(baseFilterEnv, FilterOptions{Pattern: "[invalid"})
 	if err == nil {
