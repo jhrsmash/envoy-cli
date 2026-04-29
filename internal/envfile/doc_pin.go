@@ -18,4 +18,16 @@
 //
 // The returned map is a fresh copy and will not reflect future mutations to the
 // original env map.
+//
+// # Drift Detection
+//
+// After pinning, use CompareSnapshot to diff a previously saved snapshot
+// against the current environment:
+//
+//	old, _ := envfile.LoadSnapshot(".env.pin")
+//	current, _ := envfile.Parse(".env.production")
+//	drift := envfile.CompareSnapshot(old, current)
+//	if len(drift) > 0 {
+//	    fmt.Print(envfile.FormatDrift(drift))
+//	}
 package envfile
